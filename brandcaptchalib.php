@@ -1,42 +1,15 @@
 <?php
 
 /*
- * Copyright (c) 2013 by PontaMedia
- * Author: PontaMedia
- *
+ * Copyright (c) 2015 by PontaMedia 
+ * 
  * This is a PHP library that handles calling BrandCaptcha.
  *    - Documentation and latest version
  *          http://www.pontamedia.com/
  */
 
-/* This code is based on code from,
- * and copied, modified and distributed with permission in accordance with its terms:
- * 
- * Copyright (c) 2007 reCAPTCHA -- http://recaptcha.net
- * AUTHORS:
- *   Mike Crawford
- *   Ben Maurer
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-
 define("BRANDCAPTCHA_API_HOST", "api.pontamedia.net");
+
 define("BRANDCAPTCHA_VERIFY_PATH", "/verify.php");
 define("BRANDCAPTCHA_CHALLENGE_PATH", "/challenge.php");
 
@@ -80,7 +53,7 @@ function _brandcaptcha_http_post($host, $path, $data, $port = 80) {
         while ( !feof($fs) )
                 $response .= fgets($fs, 1160); // One TCP-IP packet
         fclose($fs);
-        
+
         $response = explode("\r\n\r\n", $response, 2);
 
         return $response;
@@ -97,19 +70,29 @@ function _brandcaptcha_http_post($host, $path, $data, $port = 80) {
 
  * @return string - The HTML to be embedded in the user's form.
  */
-function brandcaptcha_get_html ($pubkey, $error = null)
+function brandcaptcha_get_html ($pubkey, $error = null, $use_ssl = false, $tags = '')
 {
-	if ($pubkey == null || $pubkey == '') {
-		die ("To use BrandCaptcha you must get an API Key");
-	}
-	
-	$server = "//". BRANDCAPTCHA_API_HOST . BRANDCAPTCHA_CHALLENGE_PATH;
-        
+        if ($pubkey == null || $pubkey == '') {
+                die ("To use BrandCaptcha you must get an API Key");
+        }
+
+        if ($use_ssl) {
+                $server = "https://". BRANDCAPTCHA_API_HOST . BRANDCAPTCHA_CHALLENGE_PATH;
+        } else {
+                $server = "//". BRANDCAPTCHA_API_HOST . BRANDCAPTCHA_CHALLENGE_PATH;
+        }
+
         $errorpart = "";
         if ($error) {
            $errorpart = "&amp;error=" . $error;
         }
-        return '<script type="text/javascript" src="'. $server . '?k=' . $pubkey . $errorpart . '"></script>';
+
+        $tagspart = "";
+        if (!empty($tags)) {
+           $tagspart = "&amp;tags=" . $tags;
+        }
+
+        return '<script type="text/javascript" src="'. $server . '?k=' . $pubkey . $errorpart . $tagspart . '"></script>';
 }
 
 
@@ -133,14 +116,14 @@ class BrandCaptchaResponse {
   */
 function brandcaptcha_check_answer ($privkey, $remoteip, $challenge, $response, $extra_params = array())
 {
-	if ($privkey == null || $privkey == '') {
-		die ("To use BrandCaptcha you must get an API key");
-	}
+        if ($privkey == null || $privkey == '') {
+                die ("To use BrandCaptcha you must get an API key");
+        }
 
-	if ($remoteip == null || $remoteip == '') {
-		die ("For security reasons, you must pass the remote ip to BrandCaptcha");
-	}
-	
+        if ($remoteip == null || $remoteip == '') {
+                die ("For security reasons, you must pass the remote ip to BrandCaptcha");
+        }
+
         //discard spam submissions
         if ($challenge == null || strlen($challenge) == 0 || $response == null || strlen($response) == 0) {
                 $brandcaptcha_response = new BrandCaptchaResponse();
@@ -171,5 +154,3 @@ function brandcaptcha_check_answer ($privkey, $remoteip, $challenge, $response, 
         return $brandcaptcha_response;
 
 }
-
-?>
