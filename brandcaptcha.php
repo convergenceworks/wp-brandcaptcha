@@ -244,6 +244,8 @@ REGISTRATION;
             
             $validated['brandcaptcha_language'] = $this->validate_dropdown($brandcaptcha_languages, 'brandcaptcha_language', $input['brandcaptcha_language']);
             $validated['xhtml_compliance'] = ($input['xhtml_compliance'] == 1 ? 1 : 0);
+
+            $validated['brandcaptcha_title'] = $input['brandcaptcha_title'];
             
             $validated['no_response_error'] = $input['no_response_error'];
             $validated['incorrect_response_error'] = $input['incorrect_response_error'];
@@ -397,6 +399,8 @@ COMMENT_FORM;
 
                 $escaped_error = htmlentities($_GET['rerror'], ENT_QUOTES);
 
+                echo (!empty($this->options['brandcaptcha_title'])) ? '<label>' . $this->options['brandcaptcha_title'] .'</label>': '';
+
                 echo $brandcaptcha_js_opts . $this->get_brandcaptcha_html(isset($escaped_error) ? $escaped_error : null, $use_ssl) . $comment_string;
            }
         }
@@ -485,7 +489,8 @@ JS;
                $comment = get_comment($comment_id);
 
                // todo: removed double quote from list of 'dangerous characters'
-               $com = preg_replace('/([\\/\(\)\+\;\'])/e','\'%\'.dechex(ord(\'$1\'))', $comment->comment_content);
+               // todo: removed /e regex modifier
+               $com = preg_replace('/([\\/\(\)\+\;\'])/','\'%\'.dechex(ord(\'$1\'))', $comment->comment_content);
                 
                $com = preg_replace('/\\r\\n/m', '\\\n', $com);
                 

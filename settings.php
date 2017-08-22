@@ -100,8 +100,16 @@
                <label for="brandcaptcha_options[xhtml_compliance]"><?php _e('Produce XHTML 1.0 Strict Compliant Code', 'brandcaptcha'); ?></label>
             </td>
          </tr>
+
+         <tr valign="top">
+         <th scope="row"><?php _e('Brandcaptcha Title', 'brandcaptcha'); ?></th>
+         <td>
+            <input type="text" id ="brandcaptcha_options[brandcaptcha_title]" name="brandcaptcha_options[brandcaptcha_title]" value="<?php echo $this->options['brandcaptcha_title']; ?>" />
+            <label for="brandcaptcha_options[brandcaptcha_title]"><?php _e('Insert text before Brandcaptcha', 'brandcaptcha'); ?></label>
+         </td>
+      </tr>
       </table>
-      
+
       <h3><?php _e('Error Messages', 'brandcaptcha'); ?></h3>
       <table class="form-table">
          <tr valign="top">
